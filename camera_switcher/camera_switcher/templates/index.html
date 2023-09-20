@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <title>camera switcher</title>
+    <meta charset="utf-8" />
+    <script>
+        let openedTab = null;
+        let tabURL = 'http://192.168.2.3:9000/html/test.html';
+
+        function cam_switch(url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "OK") {
+                        const params = new URLSearchParams(url.split('?')[1]);
+                        const serviceName = params.get('service_name');
+                        if (serviceName) {
+                            document.getElementById('result').innerText = serviceName;
+                            if (openedTab && !openedTab.closed) {
+                                openedTab.location.reload();
+                            } else {
+                                openedTab = window.open(tabURL);
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>rover cam switcher</h1>
+    <table>
+        <tr>
+            <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-frontcenter')">Front
+                    Center</button></td>
+            <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-frontleft')">Front
+                    Left</button></td>
+            <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-frontright')">Front
+                    Right</button></td>
+            <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-frontdown')">Front
+                    Down</button></td>
+        </tr>
+        <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-rearcenter')">Rear
+                Center</button></td>
+        <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-rearleft')">Rear Left</button>
+        </td>
+        <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-rearright')">Rear Right</button>
+        </td>
+        <td><button onclick="cam_switch('/control_service?action=start&service_name=cam-reardown')">Rear Down</button>
+        </td>
+        <tr>
+        </tr>
+    </table>
+    <h2>Current camera</h2>
+    <div id="result"></div>
+</body>
+
+</html>
